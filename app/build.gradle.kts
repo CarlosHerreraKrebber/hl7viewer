@@ -65,5 +65,4 @@ dependencies {
 
     implementation(libs.hilt.adroid)
     kapt(libs.hilt.compiler)
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
 }
