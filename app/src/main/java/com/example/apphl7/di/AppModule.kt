@@ -4,9 +4,10 @@ import com.example.apphl7.data.repository.HL7RepositoryImpl
 import com.example.apphl7.domain.repository.HL7Repository
 import com.example.apphl7.domain.usecase.ParseHL7FileUseCase
 import dagger.Module
+import dagger.InstallIn
 
 @Module
-@InsallIn(SingletonComponent::class)
+@InstallIn(SingletonComponent::class)
 object AppModule {
     @Provides
     @Singleton
