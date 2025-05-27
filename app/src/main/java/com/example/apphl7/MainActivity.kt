@@ -9,7 +9,7 @@ import androidx.hilt.naviagtion.compose.hiltViewModel
 import com.example.apphl7.presentation.screen.HL7Screen
 import com.example.apphl7.presentation.viewmodel.HL7ViewModel
 
-@AndroidEnteryPoint
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
