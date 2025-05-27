@@ -3,7 +3,7 @@ package com.example.apphl7.data.dataLoader
 import android.content.Context
 
 class HL7FileLoader {
-    fun loadHL7ContentFromAssets(context: Context, fileName: String)): String {
+    fun loadHL7ContentFromAssets(context: Context, fileName: String): String {
         val inputStream = context.assets.open(fileName)
         return inputStream.bufferedReader().use { it.readText()}
     }
