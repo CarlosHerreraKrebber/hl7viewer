@@ -13,3 +13,6 @@ Data in vertical card
 if Notes thoese in a blue box
 On click to card with note open new window or bottom sheet for full display of note 
 
+
+------ 
+at the Moment: -Hilt dependency probm, -Interface bearbone list with enterys
