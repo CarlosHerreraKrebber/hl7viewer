@@ -1,6 +1,7 @@
 [versions]
 agp = "8.10.0"
 hiltAdroid = "2.56.2"
+hiltLifecycleViewmodel = "1.0.0-alpha03"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -15,7 +16,9 @@ supportAnnotations = "28.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-hilt-lifecycle-viewmodel = { module = "androidx.hilt:hilt-lifecycle-viewmodel", version.ref = "hiltLifecycleViewmodel" }
 hilt-adroid = { module = "com.google.dagger:hilt-adroid", version.ref = "hiltAdroid" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAdroid" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAdroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

@@ -59,10 +59,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("com.google.dagger:hilt-android:2.56.2")
-    implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
+    implementation(libs.hilt.android)
+    implementation (libs.androidx.hilt.lifecycle.viewmodel)
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-
-    implementation(libs.hilt.adroid)
     kapt(libs.hilt.compiler)
 }
