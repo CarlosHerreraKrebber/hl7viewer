@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.dagger.hilt.android") version "2.56.2" apply false
+    id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
 }
 android {
@@ -58,6 +58,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation("com.google.dagger:hilt-android:2.56.2")
     implementation(libs.hilt.adroid)
     kapt(libs.hilt.compiler)
 
