@@ -60,16 +60,17 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.hilt.android)
-    implementation (libs.androidx.hilt.lifecycle.viewmodel)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.navigation.fragment)
 
-    implementation(libs.hilt.android.v250)
-    kapt(libs.hilt.compiler.v250)
+    // Hilt
+    implementation ("com.google.dagger:hilt-android:2.56")
+    kapt ("com.google.dagger:hilt-android-compiler:2.56") // Use kapt for annotation processing
 
     // For Hilt + ViewModel
-    implementation(libs.androidx.hilt.navigation.compose.v120)
     kapt(libs.androidx.hilt.compiler)
+
+
 
     kapt(libs.hilt.compiler)
 }

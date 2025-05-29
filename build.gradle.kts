@@ -6,3 +6,10 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.56.2" apply false
     id("com.google.devtools.ksp") version "1.9.23-1.0.20"
 }
+
+// In your top-level build.gradle (project-level)
+buildscript {
+    dependencies {
+        classpath ("com.google.dagger:hilt-android-gradle-plugin:2.56.2")
+    }
+}
