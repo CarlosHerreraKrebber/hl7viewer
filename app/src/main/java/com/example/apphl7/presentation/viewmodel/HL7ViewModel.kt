@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.compose.runtime.*
 
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.apphl7.domain.model.HL7Message
 import com.example.apphl7.domain.usecase.LoadAndParseHL7FileUseCase
@@ -15,17 +17,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HL7ViewModel @Inject constructor(
-    application: Application,
     private val loadAndParseHL7File: LoadAndParseHL7FileUseCase
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     var parsedMessage by mutableStateOf<HL7Message?>(null)
         private set
 
-    init {
+    fun loadHL7(context: android.content.Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            parsedMessage = loadAndParseHL7File(getApplication(), "Beispiel_HL7.hl7")
-
+            parsedMessage = loadAndParseHL7File(context, "hl7_sample.hl7")
         }
     }
 }
