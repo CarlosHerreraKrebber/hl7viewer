@@ -13,17 +13,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    @Provides
-    @Singleton
-    fun provideHL7FileLoader(): HL7FileLoader = HL7FileLoader()
 
     @Provides
     @Singleton
     fun provideHL7Repository(loader: HL7FileLoader): HL7Repository = HL7RepositoryImpl(loader)
 
-    @Provides
-    @Singleton
-    fun provideLoadAndParseHL7FileUseCase(repo: HL7Repository): LoadAndParseHL7FileUseCase {
-        return LoadAndParseHL7FileUseCase(repo)
-    }
 }
