@@ -61,6 +61,15 @@ dependencies {
 
     implementation(libs.hilt.android)
     implementation (libs.androidx.hilt.lifecycle.viewmodel)
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.fragment)
+
+    implementation(libs.hilt.android.v250)
+    kapt(libs.hilt.compiler.v250)
+
+    // For Hilt + ViewModel
+    implementation(libs.androidx.hilt.navigation.compose.v120)
+    kapt(libs.androidx.hilt.compiler)
+
     kapt(libs.hilt.compiler)
 }
