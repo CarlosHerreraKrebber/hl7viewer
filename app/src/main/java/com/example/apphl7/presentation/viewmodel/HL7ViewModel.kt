@@ -25,7 +25,7 @@ class HL7ViewModel @Inject constructor(
 
     fun loadHL7(context: android.content.Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            parsedMessage = loadAndParseHL7File(context, "hl7_sample.hl7")
+            parsedMessage = loadAndParseHL7File(context, "Beispiel HL7.hl7")
         }
     }
 }
