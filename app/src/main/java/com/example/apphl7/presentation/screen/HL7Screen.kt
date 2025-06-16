@@ -20,19 +20,22 @@ fun HL7Screen(viewModel: HL7ViewModel,context: Context) {
     }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("HL7 Segments", style = MaterialTheme.typography.titleLarge)
+        Text("Meine Befunde", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
 
         if (message == null) {
             Text("No HL7 content parsed yet.")
         } else {
+            val personID = message.pid
             LazyColumn {
-                items(message.segments) { segment ->
-                    Text(text = segment.name, style = MaterialTheme.typography.titleMedium)
-                    Text(text = segment.fields.joinToString(", "))
+                item {
+                    Text(text = personID.patientName, style = MaterialTheme.typography.titleMedium)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                 }
             }
         }
+
+
     }
+
 }
