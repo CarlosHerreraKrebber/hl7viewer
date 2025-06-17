@@ -19,6 +19,7 @@ fun HL7Screen(viewModel: HL7ViewModel,context: Context) {
         viewModel.loadHL7(context)
     }
 
+// do some basic kotlin and compose tuts
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("Meine Befunde", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))

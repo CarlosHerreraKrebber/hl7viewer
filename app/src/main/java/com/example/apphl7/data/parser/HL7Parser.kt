@@ -11,6 +11,11 @@ import com.example.apphl7.domain.model.ObservationGroups
 import com.example.apphl7.domain.model.PID
 import com.example.apphl7.domain.model.PVX
 
+/*
+move the parser to the data classes methops -- then it should be callable with .
+HWhating all the tutorials as a step back to better under the code
+ */
+
 object HL7Parser {
     fun parse(content: String): HL7Message {
         val rawSegments = content.lines().filter { it.isNotBlank() }.map { line ->
@@ -18,12 +23,10 @@ object HL7Parser {
             HL7Segment(fields[0], fields.drop(1))
         }
 
-        val msh: MSH = rawSegments.find { it.name == "MSH" }?.let {parseMSH(it)}
-            ?: error("MSH segment not found or invalid")
-        val pid: PID= rawSegments.find { it.name == "PID" }?.let { parsePID(it) }
-            ?: throw IllegalArgumentException("PID empty")
-        val pv1: PVX = rawSegments.find { it.name == "PVX" }?.let { parsePVX(it) }
-            ?: throw IllegalArgumentException("PV empty")
+        val msh= rawSegments.find { it.name == "MSH" }?.let { MSH.parseMSH(it) }
+        val pid= rawSegments.find { it.name == "PID" }?.let { PID.parsePID(it) }
+        val pv1 = rawSegments.find { it.name == "PV1" }?.let { PVX.parsePVX(it) }
+          //  ?: throw IllegalArgumentException("PV empty")
         val observations = mutableListOf<ObservationGroups>()
 
         var currentORC: ORC? = null
@@ -67,27 +70,7 @@ object HL7Parser {
         )
     }
 
-    fun parseMSH(segment: HL7Segment): MSH {
-        return MSH(
-            fieldSeparator = '|',
-            encodingChars = segment.fields.getOrElse(0) { "^~&" },
-            sendingApp = segment.fields.getOrNull(1),
-            sendingFacility = segment.fields.getOrNull(2),
-            receivingApp = segment.fields.getOrNull(3),
-            receivingFacility = segment.fields.getOrNull(4),
-            dateTimeOfMessage = segment.fields.getOrNull(5),
-            security = segment.fields.getOrNull(6),
-            messageType = segment.fields.getOrNull(7),
-            messageControlId = segment.fields.getOrNull(8),
-            processingId = segment.fields.getOrNull(9),
-            versionId = segment.fields.getOrNull(10),
-            sequenceNumber = segment.fields.getOrNull(11),
-            continuationPointer = segment.fields.getOrNull(12),
-            acceptAcknowledgmentType = segment.fields.getOrNull(13),
-            applicationAcknowledgmentType = segment.fields.getOrNull(14),
-            countryCode = segment.fields.getOrNull(15)
-        )
-    }
+
 
     fun parsePID(segment: HL7Segment): PID {
         return PID(
@@ -105,29 +88,7 @@ object HL7Parser {
         )
     }
 
-    fun parsePVX(segment: HL7Segment): PVX {
-        return PVX(
-            setId = segment.fields.getOrNull(0),
-            patientClass = segment.fields.getOrNull(1),
-            assignedPatientLocation = segment.fields.getOrNull(2),
-            admissionType = segment.fields.getOrNull(3),
-            preadmitNumber = segment.fields.getOrNull(4),
-            priorPatientLocation = segment.fields.getOrNull(5),
-            attendingDoctor = segment.fields.getOrNull(6),
-            referringDoctor = segment.fields.getOrNull(7),
-            consultingDoctor = segment.fields.getOrNull(8),
-            hospitalService = segment.fields.getOrNull(9),
-            temporaryLocation = segment.fields.getOrNull(10),
-            preadmitTestIndicator = segment.fields.getOrNull(11),
-            readmissionIndicator = segment.fields.getOrNull(12),
-            admitSource = segment.fields.getOrNull(13),
-            ambulatoryStatus = segment.fields.getOrNull(14),
-            vipIndicator = segment.fields.getOrNull(15),
-            admittingDoctor = segment.fields.getOrNull(16),
-            patientType = segment.fields.getOrNull(17),
-            visitNumber = segment.fields.getOrNull(18)
-        )
-    }
+
 
     fun parseORC(segment: HL7Segment): ORC {
         return ORC(
