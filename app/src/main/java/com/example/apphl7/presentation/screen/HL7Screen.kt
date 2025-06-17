@@ -30,9 +30,22 @@ fun HL7Screen(viewModel: HL7ViewModel,context: Context) {
             val personID = message.pid
             LazyColumn {
                 item {
-                    Text(text = personID.patientName, style = MaterialTheme.typography.titleMedium)
+                    personID?.let { Text(text = it.patientName.toString(), style = MaterialTheme.typography.titleMedium) }
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+
                 }
+            }
+            val observations = message.observations
+            LazyColumn {
+                    item {
+                        observations?.let { Text(text = " Anzahl der Befunde is: " +  it.o .size.toString(), style = MaterialTheme.typography.titleMedium) }
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+
+                    }
+
+
             }
         }
 

@@ -18,28 +18,35 @@ data class MSH(
     val continuationPointer: String?,
     val acceptAcknowledgmentType: String?,
     val applicationAcknowledgmentType: String?,
-    val countryCode: String?
+    val countryCode: String?,
+    val charSet: String?,
+    val pincipalLanguageMessage: String?
 ) {
     companion object {
         fun parseMSH(segment: HL7Segment): MSH {
+            val f = segment.fields
+            var i = 0 // skip MSH segment name
+            fun next() = f.getOrNull(i++)
             return MSH(
                 fieldSeparator = '|',
-                encodingChars = segment.fields.getOrElse(0) { "^~&" },
-                sendingApp = segment.fields.getOrNull(1),
-                sendingFacility = segment.fields.getOrNull(2),
-                receivingApp = segment.fields.getOrNull(3),
-                receivingFacility = segment.fields.getOrNull(4),
-                dateTimeOfMessage = segment.fields.getOrNull(5),
-                security = segment.fields.getOrNull(6),
-                messageType = segment.fields.getOrNull(7),
-                messageControlId = segment.fields.getOrNull(8),
-                processingId = segment.fields.getOrNull(9),
-                versionId = segment.fields.getOrNull(10),
-                sequenceNumber = segment.fields.getOrNull(11),
-                continuationPointer = segment.fields.getOrNull(12),
-                acceptAcknowledgmentType = segment.fields.getOrNull(13),
-                applicationAcknowledgmentType = segment.fields.getOrNull(14),
-                countryCode = segment.fields.getOrNull(15)
+                encodingChars = next(),
+                sendingApp = next(),
+                sendingFacility = next(),
+                receivingApp = next(),
+                receivingFacility = next(),
+                dateTimeOfMessage = next(),
+                security = next(),
+                messageType = next(),
+                messageControlId = next(),
+                processingId = next(),
+                versionId = next(),
+                sequenceNumber = next(),
+                continuationPointer = next(),
+                acceptAcknowledgmentType = next(),
+                applicationAcknowledgmentType = next(),
+                countryCode = next(),
+                charSet = next(),
+                pincipalLanguageMessage = next()
             )
         }
     }
