@@ -23,7 +23,7 @@ data class MSH(
     val pincipalLanguageMessage: String?
 ) {
     companion object {
-        fun parseMSH(segment: HL7Segment): MSH {
+        fun fillMSH(segment: HL7Segment): MSH {
             val f = segment.fields
             var i = 0 // skip MSH segment name
             fun next() = f.getOrNull(i++)

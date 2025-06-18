@@ -4,5 +4,5 @@ data class HL7Message(
     val msh: MSH?,
     val pid: PID?,
     val pvx: PV1?,
-    val observations: List<ObservationGroups>
+    val observations: ObservationGroups
 )

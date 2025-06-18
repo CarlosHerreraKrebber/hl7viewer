@@ -23,7 +23,7 @@ data class OBX(
     val observationSite: List<String>?    // OBX‑20 (repeating CWE)
 ) {
     companion object {
-        fun parseOBX(segment: HL7Segment): OBX {
+        fun fillOBX(segment: HL7Segment): OBX {
             val f = segment.fields
             var i = 0
             fun next() = f.getOrNull(i++)

@@ -33,7 +33,7 @@ data class PID(
     val deathIndicator: String?
 ) {
     companion object {
-        fun parsePID(segment: HL7Segment): PID {
+        fun fillPID(segment: HL7Segment): PID {
             val f = segment.fields
             var i = 0
             fun next() = f.getOrNull(i++)

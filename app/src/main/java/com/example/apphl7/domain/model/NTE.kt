@@ -6,7 +6,7 @@ data class NTE(
     val comment: String?
 ) {
     companion object {
-        fun parseNTE(segment: HL7Segment): NTE {
+        fun fillNTE(segment: HL7Segment): NTE {
             var i = 0
             return NTE(
                 setId = segment.fields.getOrNull(i++),
