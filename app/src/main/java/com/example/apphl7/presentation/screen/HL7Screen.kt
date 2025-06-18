@@ -36,10 +36,11 @@ fun HL7Screen(viewModel: HL7ViewModel,context: Context) {
 
                 }
             }
-            val observations = message.observations
+
+            val observations = message.observations.obrGroup
             LazyColumn {
                     item {
-                        observations?.let { Text(text = " Anzahl der Befunde is: " +  it.o .size.toString(), style = MaterialTheme.typography.titleMedium) }
+                        observations?.let { Text(text = it.get().toString() , style = MaterialTheme.typography.titleMedium) }
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
 
