@@ -53,12 +53,12 @@ object HL7Parser {
                     }
                     currentOBR = OBR.fillOBR(seg)
                 }
-                "OBX" -> currentOBXs += OBX.fillOBX(seg)
-                "NTE" -> currentNTEs += NTE.fillNTE(seg)
+                "OBX" -> currentOBXs.add(OBX.fillOBX(seg))
+                "NTE" -> currentNTEs.add(NTE.fillNTE(seg))
             }
         }
-        if (currentOBR != null){
-            allGroup += OBRGroup(currentOBR, currentOBXs, currentNTEs)
+        if (currentOBR != null){ // close last open group
+            allGroup.add(OBRGroup(currentOBR, currentOBXs, currentNTEs))
         }
         return allGroup
     }
