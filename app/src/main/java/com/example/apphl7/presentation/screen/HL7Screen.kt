@@ -21,6 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.apphl7.domain.model.HL7Message
+import com.example.apphl7.domain.model.OBRGroup
 import com.example.apphl7.presentation.viewmodel.HL7ViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -257,38 +259,7 @@ fun HL7Screen(viewModel: HL7ViewModel, context: Context) {
                                     style = MaterialTheme.typography.titleMedium
                                 )
 
-                                // Custom Line with Value Indicator
-                                val value =
-                                    observation.obx.first().observationValue?.toFloatOrNull() ?: 0f
-                                val maxValue = 100f // Replace with actual max if known
-                                val percentage = (value / maxValue).coerceIn(0f, 1f)
-
-                                Canvas(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(30.dp) // Enough space for line + text
-                                ) {
-                                    val lineHeight = size.height / 2
-
-                                    // Background line
-                                    drawLine(
-                                        color = Color.LightGray,
-                                        start = Offset(0f, lineHeight),
-                                        end = Offset(size.width, lineHeight),
-                                        strokeWidth = 8f
-                                    )
-
-                                    // Foreground line up to percentage
-                                    drawLine(
-                                        color = Color.Green,
-                                        start = Offset(0f, lineHeight),
-                                        end = Offset(size.width * percentage, lineHeight),
-                                        strokeWidth = 8f
-                                    )
-
-
-                                    //  HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                                }
+                                ValueGraph(message,observation)
 
                                 // bottom sheet and navigation to show the notiz part.
                                 // setting Naviagtion graph for it Nav controller and Nav host.
@@ -310,5 +281,77 @@ fun HL7Screen(viewModel: HL7ViewModel, context: Context) {
                 }
             }
         }
+    }
+}
+@Composable
+fun ValueGraph(message: HL7Message, observation: OBRGroup ){
+    // Custom Line with Value Indicator
+    val value =
+        observation.obx.first().observationValue?.toFloatOrNull() ?: 0f
+    val range = observation.obx.first().referenceRange.toString()
+    var lowerDev = 0f
+    var upperDev = 100f
+    when {
+        range.contains("-") ->
+        {
+            val parts = range.split("-")
+            val lowerDev = parts.firstOrNull()?.toFloatOrNull()
+            val upperDev = parts.lastOrNull()?.toFloatOrNull()
+        }
+        range.contains(">") ->
+        {
+            val parts = range.split(">")
+            val lowerDev = parts.firstOrNull()?.toFloatOrNull()
+            val upperDev = parts.lastOrNull()?.toFloatOrNull()
+        }
+        range.contains("<") ->
+        {
+            val parts = range.split("<")
+            val lowerDev = parts.firstOrNull()?.toFloatOrNull()
+            val upperDev = parts.lastOrNull()?.toFloatOrNull()
+        }
+        else ->{
+            val lowerDev = null
+            val upperDev = null
+        }
+    }
+
+    val maxValue = 100f // Replace with actual max if known
+    val percentage = (value / maxValue).coerceIn(0f, 1f)
+
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(30.dp) // Enough space for line + text
+    ) {
+        val lineHeight = size.height / 2
+
+//        drawLine(color = Color.Green,
+//            start = Offset(0f,lineHeight),
+//            end =Offset(lowerDev,lineHeight)
+//        )
+
+        // Background line
+        drawLine(
+            color = Color.LightGray,
+            start = Offset(0f, lineHeight),
+            end = Offset(size.width, lineHeight),
+            strokeWidth = 8f
+        )
+
+        // Foreground line up to percentage
+        drawLine(
+            color = Color.Green,
+            start = Offset(0f, lineHeight),
+            end = Offset(size.width * percentage, lineHeight),
+            strokeWidth = 8f
+        )
+
+//        drawCircle(
+//            color = Color.Green,
+//            center = Offset(value,lineHeight)
+//        )
+
+        //  HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
     }
 }
