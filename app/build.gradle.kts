@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.support.annotations)
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.foundation.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -70,7 +72,7 @@ dependencies {
     // For Hilt + ViewModel
     kapt(libs.androidx.hilt.compiler)
 
-
+    implementation (libs.androidx.material.icons.extended)
 
     kapt(libs.hilt.compiler)
 }

@@ -1,102 +1,287 @@
 package com.example.apphl7.presentation.screen
 
 import android.content.Context
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Outline.Rectangle
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.apphl7.domain.model.NTE
 import com.example.apphl7.presentation.viewmodel.HL7ViewModel
-import org.w3c.dom.Text
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HL7Screen(viewModel: HL7ViewModel,context: Context) {
+fun HL7Screen(viewModel: HL7ViewModel, context: Context) {
     val message = viewModel.parsedMessage
 
     LaunchedEffect(Unit) {
         viewModel.loadHL7(context)
     }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
+    fun String?.costumSplit(): List<String> = this?.trim()?.split("^") ?: emptyList()
 
-    Column(modifier = Modifier
-        .padding(16.dp),
-        ) {
-        if (message != null) {
-            Text(
-                "Report " + message.msh?.messageType.toString(),
-                style = MaterialTheme.typography.titleLarge
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            MediumTopAppBar(
+                title = { Text("HL7 Report") },
+                navigationIcon = {
+                    IconButton(onClick = { /* TODO: Back navigation */ }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* TODO: Overflow */ }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    }
+                },
+                scrollBehavior = scrollBehavior
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+        ) {
 
-        if (message == null) {
-            Text("No HL7 content parsed yet.")
-        } else {
-            val personID = message.pid
-            LazyColumn {
-                item {
-                    personID?.let {
-                        Text(
-                            text = it.patientName.toString(),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                }
-            }
+            //Spacer(modifier = Modifier.height(8.dp))
 
-            val validObservations =
-                message.observations.obrGroup.filter { it.obx.first().valueType == "CE" }
-            LazyColumn {
-                item {
-                    Text(
-                        text = "Anzahl der Befunde auffälliger: " + validObservations.size.toString(),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                }
-            }
+            if (message == null) {
+                Text("No HL7 content parsed yet.")
+            } else {
 
-            LazyColumn(Modifier.padding(16.dp)
-            ) {
-                items(validObservations) {
-                    it.let {
-                        Text(
-                            text = it.obx.first().observationId.toString(),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
-                    it.let { Text(
-                        text = "current Value " + it.obx.first().observationValue.toString(),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    }
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                val hl7Type = message.msh?.messageType?.costumSplit()?.joinToString(" ")
 
-                    if (it.nte.isNotEmpty()) {
-                        it.let {
+                val personID = message.pid
+                val validObservations =
+                    message.observations.obrGroup.filter { it.obx.first().valueType == "CE" }
+
+                val auffälligBefunde = validObservations.count()
+                    //.obrGroup.firstOrNull()?.abnormalFlags?.isNotBlank()
+                LazyColumn(Modifier.padding(16.dp)) {
+
+
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.Blue)
+
+
+                        ) {
                             Text(
-                                text = "Info Notize: " + it.nte.mapNotNull { it.comment}.filter{it.isNotBlank()}
-                                    .joinToString(),
-                                style = MaterialTheme.typography.titleMedium
+                                "Report $hl7Type",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = Color.White
                             )
+                            personID?.let {
+                                Text(
+                                    text = it.patientName.costumSplit().joinToString(" "),
+                                    style = MaterialTheme.typography.titleMedium,
+                                            color = Color.White
+
+                                )
+                                Text( text = " Test Subject",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Color(0xFFFF781F))
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                // .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(8.dp))
+                                //.padding(12.dp)
+                                ,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Geburstag",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Color.White
+
+                                )
+                                Text(
+                                    text = "Tagesbuchungsnummer",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Color.White
+
+                                )
+                            }
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                // .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(8.dp))
+                                //.padding(12.dp)
+                                ,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                val Birthday = personID?.birthDate
+                                val test = message.msh?.dateTimeOfMessage.toString()
+
+                                Text(
+                                    text = java.time.LocalDate.parse(Birthday.toString(),java.time.format.DateTimeFormatter.ofPattern("yyyyddMM"))
+                                        .format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                                    color = Color.White
+                                )
+                                message.msh?.messageControlId?.let { Text(text = it.replace(test,""),
+                                    color = Color.White) }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                    }
+
+
+                    item {
+                        Row( modifier = Modifier
+                            .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center // Center text inside column
+                           ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(
+                                        color = Color(0xFFFFCDD2), // Light red background
+                                        shape = CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Warning,
+                                    contentDescription = "Warning",
+                                    tint = Color(0xFFD32F2F), // Dark red tint
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+
+
+                            Column ( modifier = Modifier
+                                ,
+                                        verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "${
+                                        validObservations.count { obs ->
+                                            obs.obx.firstOrNull()?.abnormalFlags?.isNotBlank() == true
+                                        }
+                                    } auffällige Befunde ",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    textAlign = TextAlign.Center,
+                                )
+                                Text( text = " Überprüfung Notwendig",
+                                    textAlign = TextAlign.Center,
+                                    color = Color.Red)
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.padding(vertical = 8.dp))
+                    }
+                    items(validObservations) { observation ->
+                        ElevatedCard(
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation = 6.dp
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+
+                                    text = observation.obx.first().observationId.costumSplit()
+                                        .drop(1).joinToString(" ").replace(
+                                            Regex("\\s+"), " "
+                                        ),
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                                Text(
+                                    text = "in " + observation.obx.first().units.toString(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.Gray
+                                )
+
+                                Text(
+                                    text = "current Value " + observation.obx.first().observationValue.toString(),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+
+                                // Custom Line with Value Indicator
+                                val value =
+                                    observation.obx.first().observationValue?.toFloatOrNull() ?: 0f
+                                val maxValue = 100f // Replace with actual max if known
+                                val percentage = (value / maxValue).coerceIn(0f, 1f)
+
+                                Canvas(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(30.dp) // Enough space for line + text
+                                ) {
+                                    val lineHeight = size.height / 2
+
+                                    // Background line
+                                    drawLine(
+                                        color = Color.LightGray,
+                                        start = Offset(0f, lineHeight),
+                                        end = Offset(size.width, lineHeight),
+                                        strokeWidth = 8f
+                                    )
+
+                                    // Foreground line up to percentage
+                                    drawLine(
+                                        color = Color.Green,
+                                        start = Offset(0f, lineHeight),
+                                        end = Offset(size.width * percentage, lineHeight),
+                                        strokeWidth = 8f
+                                    )
+
+
+                                    //  HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                                }
+
+                                // bottom sheet and navigation to show the notiz part.
+                                // setting Naviagtion graph for it Nav controller and Nav host.
+                                if (observation.nte.isNotEmpty()) {
+                                    //   IconButton(onClick = { showInfo = !showInfo }) { }
+                                    Text(
+                                        text = "Info Notize: " + observation.nte.mapNotNull {
+                                            it.comment?.replace(
+                                                Regex("\\s+"), " "
+                                            )
+                                        }.filter { it.isNotBlank() }
+                                            .joinToString(),
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                }
+                            }
                         }
                     }
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
                 }
-
             }
         }
-
-
     }
 }

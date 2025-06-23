@@ -8,7 +8,7 @@ data class OBX(
     val observationValue: String?,        // OBX‑5
     val units: String?,                    // OBX‑6
     val referenceRange: String?,          // OBX‑7
-    val abnormalFlags: List<String>?,     // OBX‑8 (repeating)
+    val abnormalFlags: String?,     // OBX‑8 (repeating)
     val probability: String?,             // OBX‑9
     val natureOfAbnormal: String?,        // OBX‑10
     val resultStatus: String?,            // OBX‑11
@@ -16,14 +16,13 @@ data class OBX(
     val userAccessChecks: String?,        // OBX‑13
     val dateTimeOfObs: String?,           // OBX‑14
     val producerId: String?,              // OBX‑15
-    val responsibleObserver: List<String>?, // OBX‑16 (repeating XCN)
-    val observationMethod: List<String>?, // OBX‑17 (repeating CE)
-    val equipmentInstanceId: String?,     // OBX‑18 (v2.5+, included for completeness)
-    val analysisDateTime: String?,        // OBX‑19 (optional, some versions)
-    val observationSite: List<String>?    // OBX‑20 (repeating CWE)
+    val responsibleObserver: String?, // OBX‑16 (repeating XCN)
+    val observationMethod: String?, // OBX‑17 (repeating CE)
 ) {
     companion object {
-        fun fillOBX(segment: HL7Segment): OBX {
+        const val segID = "OBX"
+        // see for
+        fun fromSegment(segment: HL7Segment): OBX {
             val f = segment.fields
             var i = 0
             fun next() = f.getOrNull(i++)
@@ -37,7 +36,7 @@ data class OBX(
                 observationValue = next(),
                 units = next(),
                 referenceRange = next(),
-                abnormalFlags = nextList(),
+                abnormalFlags = next(),
                 probability = next(),
                 natureOfAbnormal = next(),
                 resultStatus = next(),
@@ -45,11 +44,8 @@ data class OBX(
                 userAccessChecks = next(),
                 dateTimeOfObs = next(),
                 producerId = next(),
-                responsibleObserver = nextList(),
-                observationMethod = nextList(),
-                equipmentInstanceId = next(),     // Not in v2.3, but often added in implementations
-                analysisDateTime = next(),        // OBX‑19 (by some extensions)
-                observationSite = nextList()
+                responsibleObserver = next(),
+                observationMethod = next()
             )
         }
     }

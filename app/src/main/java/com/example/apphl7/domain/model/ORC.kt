@@ -21,7 +21,9 @@ data class ORC(
     val actionBy: String?,                // ORC-19
 ) {
     companion object {
-        fun fillORC(segment: HL7Segment): ORC {
+        const val segID = "ORC"
+
+        fun fromSegment(segment: HL7Segment): ORC {
             val f = segment.fields
             var i = 0
             fun next() = f.getOrNull(i++)

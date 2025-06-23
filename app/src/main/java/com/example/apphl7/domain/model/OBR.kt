@@ -45,7 +45,9 @@ data class OBR(
     val plannedPatientTransportComment: List<String>? // OBR‑43 (repeating)
 ) {
     companion object {
-        fun fillOBR(segment: HL7Segment): OBR {
+        const val segID = "OBR"
+
+        fun fromSegment(segment: HL7Segment): OBR {
             val f = segment.fields
             var i = 0
             fun next() = f.getOrNull(i++)

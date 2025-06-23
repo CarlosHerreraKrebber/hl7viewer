@@ -23,10 +23,10 @@ object HL7Parser {
             HL7Segment(fields[0], fields.drop(1))
         }
 
-        val msh = rawSegments.find { it.name == "MSH" }?.let { MSH.fillMSH(it) }
-        val pid = rawSegments.find { it.name == "PID" }?.let { PID.fillPID(it) }
-        val pv1 = rawSegments.find { it.name == "PV1" }?.let { PV1.fillPV1(it) }
-        val orc = rawSegments.find { it.name == "ORC" }?.let { ORC.fillORC(it) }
+        val msh = rawSegments.find { it.name == MSH.segID }?.let { MSH.fromSegment(it) }
+        val pid = rawSegments.find { it.name == PID.segID }?.let { PID.fromSegment(it) }
+        val pv1 = rawSegments.find { it.name == PV1.segID }?.let { PV1.fromSegment(it) }
+        val orc = rawSegments.find { it.name == ORC.segID }?.let { ORC.fromSegment(it) }
 
         val obrs = group(rawSegments)
         val observation = ObservationGroups(orc,obrs)
@@ -37,6 +37,7 @@ object HL7Parser {
             observation
         )
     }
+// add a catch when its NTE is coming before the obs group
 
     fun group(segment: List<HL7Segment>): List<OBRGroup> {
         val allGroup = mutableListOf<OBRGroup>()
@@ -45,16 +46,16 @@ object HL7Parser {
         val currentNTEs = mutableListOf<NTE>()
         for (seg in segment) {
             when (seg.name) {
-                "OBR" -> {
+                OBR.segID -> {
                     if (currentOBR != null) {
                         allGroup.add(OBRGroup(currentOBR, currentOBXs.toList(), currentNTEs.toList()))
                         currentOBXs.clear()
                         currentNTEs.clear()
                     }
-                    currentOBR = OBR.fillOBR(seg)
+                    currentOBR = OBR.fromSegment(seg)
                 }
-                "OBX" -> currentOBXs.add(OBX.fillOBX(seg))
-                "NTE" -> currentNTEs.add(NTE.fillNTE(seg))
+                OBX.segID -> currentOBXs.add(OBX.fromSegment(seg))
+                NTE.segID -> currentNTEs.add(NTE.fromSegment(seg))
             }
         }
         if (currentOBR != null){ // close last open group

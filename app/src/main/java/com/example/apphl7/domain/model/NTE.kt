@@ -6,12 +6,16 @@ data class NTE(
     val comment: String?
 ) {
     companion object {
-        fun fillNTE(segment: HL7Segment): NTE {
+        const val segID = "NTE"
+
+        fun fromSegment(segment: HL7Segment): NTE {
+            val f = segment.fields
             var i = 0
+            fun next() = f.getOrNull(i++)
             return NTE(
-                setId = segment.fields.getOrNull(i++),
-                sourceOfComment = segment.fields.getOrNull(i++),
-                comment = segment.fields.getOrNull(i++)
+                setId = next(),
+                sourceOfComment = next(),
+                comment = next()
             )
         }
     }

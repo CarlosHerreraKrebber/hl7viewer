@@ -28,7 +28,9 @@ data class PV1(
     val contractEffectiveDate: String?  // PV1-25
 ) {
     companion object {
-        fun fillPV1(segment: HL7Segment): PV1 {
+        const val segID = "PV1"
+
+        fun fromSegment(segment: HL7Segment): PV1 {
             val f = segment.fields
             var i = 0
             fun next() = f.getOrNull(i++)
