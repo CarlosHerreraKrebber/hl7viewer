@@ -72,7 +72,5 @@ dependencies {
     // For Hilt + ViewModel
     kapt(libs.androidx.hilt.compiler)
 
-    implementation (libs.androidx.material.icons.extended)
-
     kapt(libs.hilt.compiler)
 }

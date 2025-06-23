@@ -2,34 +2,28 @@ package com.example.apphl7.presentation.screen
 
 import android.content.Context
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.apphl7.presentation.viewmodel.HL7ViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,10 +38,11 @@ fun HL7Screen(viewModel: HL7ViewModel, context: Context) {
     fun String?.costumSplit(): List<String> = this?.trim()?.split("^") ?: emptyList()
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            MediumTopAppBar(
-                title = { Text("HL7 Report") },
+           TopAppBar(
+                title = {
+                    Text("HL7 Report")
+               },
                 navigationIcon = {
                     IconButton(onClick = { /* TODO: Back navigation */ }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -58,14 +53,24 @@ fun HL7Screen(viewModel: HL7ViewModel, context: Context) {
                         Icon(Icons.Default.MoreVert, contentDescription = "More options")
                     }
                 },
-                scrollBehavior = scrollBehavior
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Blue,
+                    titleContentColor = Color.White,
+                    )
+                    ,
+                scrollBehavior = scrollBehavior,
+                modifier = Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .background(Color.Blue)
             )
+
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
         ) {
+
 
             //Spacer(modifier = Modifier.height(8.dp))
 
@@ -80,109 +85,128 @@ fun HL7Screen(viewModel: HL7ViewModel, context: Context) {
                     message.observations.obrGroup.filter { it.obx.first().valueType == "CE" }
 
                 val auffälligBefunde = validObservations.count()
-                    //.obrGroup.firstOrNull()?.abnormalFlags?.isNotBlank()
-                LazyColumn(Modifier.padding(16.dp)) {
+                //.obrGroup.firstOrNull()?.abnormalFlags?.isNotBlank()
 
+                LazyColumn{
 
                     item {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color.Blue)
-
-
-                        ) {
-                            Text(
-                                "Report $hl7Type",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = Color.White
-                            )
-                            personID?.let {
+                                .padding(16.dp,
+                                    bottom = 8.dp))  {
+                            Column(  ) {
                                 Text(
-                                    text = it.patientName.costumSplit().joinToString(" "),
-                                    style = MaterialTheme.typography.titleMedium,
+                                    "Report $hl7Type",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = Color.White
+                                )
+                                personID?.let {
+                                    Text(
+                                        text = it.patientName.costumSplit().joinToString(" "),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = Color.White
+
+                                    )
+                                    Text(
+                                        text = "\u2022 Test Subject",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = Color(0xFFFF781F)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                    // .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(8.dp))
+                                    //.padding(12.dp)
+                                    ,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = "Geburtstag",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = Color.White
+
+                                    )
+                                    Text(
+                                        text = "Tagesbuchungsnummer",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = Color.White
+
+                                    )
+                                }
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                    // .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(8.dp))
+                                    //.padding(12.dp)
+                                    ,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    val Birthday = personID?.birthDate
+                                    val test = message.msh?.dateTimeOfMessage.toString()
+
+                                    Text(
+                                        text = LocalDate.parse(
+                                            Birthday.toString(),
+                                            DateTimeFormatter.ofPattern("yyyyddMM")
+                                        )
+                                            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                                        color = Color.White
+                                    )
+                                    message.msh?.messageControlId?.let {
+                                        Text(
+                                            text = it.replace(test, ""),
                                             color = Color.White
-
-                                )
-                                Text( text = " Test Subject",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = Color(0xFFFF781F))
+                                        )
+                                    }
+                                }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            //Spacer(modifier = Modifier.height(16.dp))
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                // .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(8.dp))
-                                //.padding(12.dp)
-                                ,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "Geburstag",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = Color.White
-
-                                )
-                                Text(
-                                    text = "Tagesbuchungsnummer",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = Color.White
-
-                                )
-                            }
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                // .background(Color(0xFFEFEFEF), shape = RoundedCornerShape(8.dp))
-                                //.padding(12.dp)
-                                ,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                val Birthday = personID?.birthDate
-                                val test = message.msh?.dateTimeOfMessage.toString()
-
-                                Text(
-                                    text = java.time.LocalDate.parse(Birthday.toString(),java.time.format.DateTimeFormatter.ofPattern("yyyyddMM"))
-                                        .format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-                                    color = Color.White
-                                )
-                                message.msh?.messageControlId?.let { Text(text = it.replace(test,""),
-                                    color = Color.White) }
-                            }
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                    }
+                    }// Header with pat Infos
 
 
                     item {
-                        Row( modifier = Modifier
-                            .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center // Center text inside column
-                           ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding( top = 8.dp,
+                                    bottom = 8.dp,
+                                    start = 16.dp,
+                                        end = 16.dp
+                                    ),
+                            //verticalAlignment = Alignment.CenterVertically,
+                            //horizontalArrangement = Arrangement.Center // Center text inside column
+                        ) {
                             Box(
                                 modifier = Modifier
+                                    .padding(end = 16.dp)
                                     .size(40.dp)
                                     .background(
                                         color = Color(0xFFFFCDD2), // Light red background
                                         shape = CircleShape
                                     ),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Warning,
                                     contentDescription = "Warning",
                                     tint = Color(0xFFD32F2F), // Dark red tint
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier
+                                        .size(24.dp),
+
                                 )
                             }
 
 
-                            Column ( modifier = Modifier
-                                ,
-                                        verticalArrangement = Arrangement.Center
+                            Column(
+                                modifier = Modifier,
+                                verticalArrangement = Arrangement.Center
                             ) {
                                 Text(
                                     text = "${
@@ -193,14 +217,16 @@ fun HL7Screen(viewModel: HL7ViewModel, context: Context) {
                                     style = MaterialTheme.typography.titleMedium,
                                     textAlign = TextAlign.Center,
                                 )
-                                Text( text = " Überprüfung Notwendig",
+                                Text(
+                                    text = "Überprüfung Notwendig",
                                     textAlign = TextAlign.Center,
-                                    color = Color.Red)
+                                    color = Color.Red
+                                )
                             }
                         }
 
                         Spacer(modifier = Modifier.padding(vertical = 8.dp))
-                    }
+                    } // Show the critical findings
                     items(validObservations) { observation ->
                         ElevatedCard(
                             elevation = CardDefaults.cardElevation(
@@ -208,7 +234,8 @@ fun HL7Screen(viewModel: HL7ViewModel, context: Context) {
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = 8.dp,
+                                    horizontal = 16.dp),
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
@@ -279,7 +306,7 @@ fun HL7Screen(viewModel: HL7ViewModel, context: Context) {
                                 }
                             }
                         }
-                    }
+                    } // show all findings
                 }
             }
         }
