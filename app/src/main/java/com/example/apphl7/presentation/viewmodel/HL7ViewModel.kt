@@ -27,9 +27,5 @@ class HL7ViewModel @Inject constructor(
             parsedMessage = loadAndParseHL7File(context, "Beispiel HL7.hl7")
         }
     }
-    fun getObrByIndex(setId: Int): OBRGroup? {
-        return this.parsedMessage?.observations?.obrGroup?.firstOrNull { it.obr?.setId?.toIntOrNull() == setId }
 
-
-    }
 }

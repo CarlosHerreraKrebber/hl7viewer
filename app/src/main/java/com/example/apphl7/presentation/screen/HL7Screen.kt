@@ -8,26 +8,31 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.apphl7.R
 import com.example.apphl7.domain.model.HL7Message
 import com.example.apphl7.domain.model.OBRGroup
 import com.example.apphl7.domain.model.PID
 import com.example.apphl7.presentation.viewmodel.HL7ViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 
 fun String?.costumSplit(): List<String> = this?.trim()?.split("^") ?: emptyList()
 
@@ -40,7 +45,9 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
         viewModel.loadHL7(context)
     }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
+    val sheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
+    var selectedObservation by remember { mutableStateOf<OBRGroup?>(null) }
 
     Scaffold(
         topBar = {
@@ -50,18 +57,20 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
                 },
                 navigationIcon = {
                     IconButton(onClick = { /* TODO: Back navigation */ }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(                    painter = painterResource(id = R.drawable.iconarrowback) ,
+                             contentDescription = "Back")
                     }
                 },
                 actions = {
                     IconButton(onClick = { /* TODO: Overflow */ }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                        Icon(painterResource(id = R.drawable.iconmorevet), contentDescription = "More options")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Blue,
                     titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color.White
                 ),
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier
@@ -119,7 +128,12 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
                                             val key = observation.obr?.setId?.toIntOrNull() ?: observation.hashCode()
 
                                             if (key != -1) {
-                                                navController.navigate("BottomDetail/$key")
+                                                //navController.navigate("BottomDetail/$key")
+                                                coroutineScope.launch {
+                                                    selectedObservation = observation
+                                                    sheetState.show()
+                                                }
+
                                             }
                                         }),
 
@@ -166,6 +180,20 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
                                         }
                                     }
                                 }
+                                if (selectedObservation != null) {
+                                    ModalBottomSheet(
+                                        onDismissRequest = {
+                                            coroutineScope.launch {
+                                                sheetState.hide()
+                                            }.invokeOnCompletion {
+                                                selectedObservation = null
+                                            }
+                                        },
+                                        sheetState = sheetState
+                                    ) {
+                                        DetailContent(selectedObservation!!, context)
+                                    }
+                                }
                             }
                         } // show all findings
                     }
@@ -192,7 +220,7 @@ private fun AttentioniBox() {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector = Icons.Default.Warning,
+                painter = painterResource(id = R.drawable.iconcrisesallert) ,
                 contentDescription = "Warning Icon",
                 tint = Color(0xFFD32F2F),
             )
@@ -231,7 +259,7 @@ private fun CountAuffaelligeBefunde(validObservations: List<OBRGroup>) {
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = Icons.Default.Warning,
+                painterResource(id = R.drawable.iconhighprio),
                 contentDescription = "Warning",
                 tint = Color(0xFFD32F2F), // Dark red tint
                 modifier = Modifier
@@ -331,12 +359,12 @@ private fun Header(
                 ,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                val Birthday = personID?.birthDate
+                val birthday = personID?.birthDate
                 val test = message.msh?.dateTimeOfMessage.toString()
 
                 Text(
                     text = LocalDate.parse(
-                        Birthday.toString(),
+                        birthday.toString(),
                         DateTimeFormatter.ofPattern("yyyyddMM")
                     )
                         .format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),

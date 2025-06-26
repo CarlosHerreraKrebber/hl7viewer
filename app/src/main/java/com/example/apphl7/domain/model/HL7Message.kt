@@ -5,4 +5,10 @@ data class HL7Message(
     val pid: PID?,
     val pvx: PV1?,
     val observations: ObservationGroups
-)
+) {
+    companion object
+
+    fun getObrByIndex(setId: Int): OBRGroup { //
+        return this.observations.obrGroup.first { it.obr?.setId?.toIntOrNull() == setId }
+    }
+}

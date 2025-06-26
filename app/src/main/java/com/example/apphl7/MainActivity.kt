@@ -25,34 +25,34 @@ class MainActivity : ComponentActivity() {
         setContent {
             // NavGraph
             val navController = rememberNavController()
-            val viewModel: HL7ViewModel = hiltViewModel()
+            // val viewModel: HL7ViewModel = hiltViewModel()
             NavHost(navController = navController, startDestination = "HL7Screen")
             {
                 composable(route = "HL7Screen")
                 {
-
+                    val viewModel: HL7ViewModel = hiltViewModel()
                     HL7Screen(navController, viewModel, applicationContext)
                 }
-                composable(
-                    route = "BottomDetail/{index}",
-                    arguments = listOf(
-                        navArgument(name = "index") {
-                            type = NavType.IntType
-                        }
-                    )
-                ) { backStackEntry ->
-
-                    val index = backStackEntry.arguments?.getInt("index") ?: -1
-                    val observation = viewModel.getObrByIndex(index)
-
-                    observation?.let {
-                        BottomDetail(
-                            navController = navController,
-                            observation = it
-                        )
-                    }
-
-                }
+//                composable(
+//                    route = "BottomDetail/{index}",
+//                    arguments = listOf(
+//                        navArgument(name = "index") {
+//                            type = NavType.IntType
+//                        }
+//                    )
+//                ) { backStackEntry ->
+//                    val viewModel: HL7ViewModel =
+//                        hiltViewModel(navController.previousBackStackEntry!!)
+//                    val index = backStackEntry.arguments?.getInt("index") ?: -1
+//
+//                    BottomDetail(
+//                        navController = navController,
+//                        viewModel,
+//                        index = index
+//                    )
+//
+//
+//                }
 
             }
         }
