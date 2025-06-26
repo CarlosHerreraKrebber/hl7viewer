@@ -1,17 +1,16 @@
 package com.example.apphl7.presentation.viewmodel
 
-import android.app.Application
-import androidx.compose.runtime.*
-
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.SavedStateHandle
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.apphl7.domain.model.HL7Message
+import com.example.apphl7.domain.model.OBRGroup
 import com.example.apphl7.domain.usecase.LoadAndParseHL7FileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -27,5 +26,10 @@ class HL7ViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             parsedMessage = loadAndParseHL7File(context, "Beispiel HL7.hl7")
         }
+    }
+    fun getObrByIndex(setId: Int): OBRGroup? {
+        return this.parsedMessage?.observations?.obrGroup?.firstOrNull { it.obr?.setId?.toIntOrNull() == setId }
+
+
     }
 }
