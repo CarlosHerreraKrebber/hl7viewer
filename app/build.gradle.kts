@@ -50,6 +50,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.material3)
+    implementation(libs.androidx.material3.window.size.class1)
+    implementation(libs.androidx.material3.adaptive.navigation.suite)
+    implementation(libs.androidx.material)
     implementation(libs.support.annotations)
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.foundation.android)
@@ -60,15 +64,18 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.navigation.common)
+
+
+
 
     implementation(libs.hilt.android)
+
+
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.hilt.navigation.fragment)
 
     // Hilt
-    implementation ("com.google.dagger:hilt-android:2.56")
-    kapt ("com.google.dagger:hilt-android-compiler:2.56") // Use kapt for annotation processing
-
+    implementation (libs.hilt.android.v256)
     // For Hilt + ViewModel
     kapt(libs.androidx.hilt.compiler)
 

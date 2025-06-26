@@ -2,6 +2,7 @@
 agp = "8.10.0"
 hiltAdroid = "2.56.2"
 hiltAndroid = "2.50"
+hiltAndroidVersion = "2.56"
 hiltCompiler = "2.50"
 hiltCompilerVersion = "1.2.0"
 hiltLifecycleViewmodel = "1.0.0-alpha03"
@@ -16,10 +17,14 @@ espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
 composeBom = "2024.09.00"
+material3 = "1.3.2"
+material3AdaptiveNavigationSuite = "1.4.0-alpha16"
+material3WindowSizeClass = "1.3.2"
 materialIconsExtended = "2.56"
+navigationCommon = "2.9.0"
 supportAnnotations = "28.0.0"
 foundationAndroid = "1.7.0"
-
+material = "1.6.0"
 
 
 [libraries]
@@ -30,9 +35,14 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-hilt-navigation-compose-v120 = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationComposeVersion" }
 androidx-hilt-navigation-fragment = { module = "androidx.hilt:hilt-navigation-fragment", version.ref = "hiltNavigationFragment" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "material3AdaptiveNavigationSuite" }
+androidx-material3-window-size-class1 = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "material3WindowSizeClass" }
+androidx-navigation-common = { module = "androidx.navigation:navigation-common", version.ref = "navigationCommon" }
 hilt-adroid = { module = "com.google.dagger:hilt-adroid", version.ref = "hiltAdroid" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAdroid" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidVersion" }
 hilt-android-v250 = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-v256 = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidVersion" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAdroid" }
 hilt-compiler-v250 = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -48,8 +58,11 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 support-annotations = { group = "com.android.support", name = "support-annotations", version.ref = "supportAnnotations" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
+androidx-material = { group = "androidx.compose.material", name = "material", version.ref = "material" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
