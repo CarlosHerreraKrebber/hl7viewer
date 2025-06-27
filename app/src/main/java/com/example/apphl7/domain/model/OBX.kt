@@ -21,6 +21,7 @@ data class OBX(
 ) {
     companion object {
         const val segID = "OBX"
+
         // see for
         fun fromSegment(segment: HL7Segment): OBX {
             val f = segment.fields
@@ -48,5 +49,37 @@ data class OBX(
                 observationMethod = next()
             )
         }
+    }
+
+    fun rangeSplit(): List<Float> { // TODO define extenion funktion in the ui layer to scale the rtanges properply
+        val refRangeList = mutableListOf<Float>()
+        var lowerBound = 25f
+        var upperBound = 75f//(this.observationValue?.toFloat()?.times(1.5f))?.coerceAtLeast(1f)!!
+        if (this.referenceRange.isNullOrBlank()) {
+            refRangeList.add(lowerBound)
+            refRangeList.add(upperBound)
+        } else {
+            when { //TODO move this also to the data class range value ranging funk
+                this.referenceRange.contains("-") -> {
+                    val parts = this.referenceRange.split("-")
+                    lowerBound = parts.firstOrNull()?.toFloat() ?:-1f
+                    upperBound = parts.lastOrNull()?.toFloat() ?: -1f
+                }
+
+                this.referenceRange.contains(">") -> {
+                    lowerBound = this.referenceRange.split(">").lastOrNull()?.toFloat() ?: -1f
+                    upperBound = -1f
+                }
+
+                this.referenceRange.contains("<") -> {
+                    lowerBound = -1f
+                    upperBound = this.referenceRange.split("<").lastOrNull()?.toFloat() ?: -1f
+                }
+            }
+            refRangeList.add(lowerBound)
+            refRangeList.add(upperBound)
+        }
+
+        return refRangeList
     }
 }

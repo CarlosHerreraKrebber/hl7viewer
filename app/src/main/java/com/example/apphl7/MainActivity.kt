@@ -11,12 +11,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.apphl7.presentation.screen.AuffaelligebefundeScreen
 import com.example.apphl7.presentation.screen.BottomDetail
 import com.example.apphl7.presentation.screen.HL7Screen
 import com.example.apphl7.presentation.screen.NaviGraph
 import com.example.apphl7.presentation.viewmodel.HL7ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 
+//TODO Clean the code
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,12 +28,17 @@ class MainActivity : ComponentActivity() {
             // NavGraph
             val navController = rememberNavController()
             // val viewModel: HL7ViewModel = hiltViewModel()
-            NavHost(navController = navController, startDestination = "HL7Screen")
-            {
-                composable(route = "HL7Screen")
-                {
+            NavHost(navController = navController, startDestination = "HL7Screen") {
+                composable(route = "HL7Screen") {
                     val viewModel: HL7ViewModel = hiltViewModel()
-                    HL7Screen(navController, viewModel, applicationContext)
+                    HL7Screen(navController, viewModel)
+                }
+                composable(route = "AuffaelligebefundeScreen") {
+                    val viewModel: HL7ViewModel =
+                        hiltViewModel(navController.previousBackStackEntry!!)
+                    AuffaelligebefundeScreen(
+                        navController = navController, viewModel = viewModel
+                    )
                 }
 //                composable(
 //                    route = "BottomDetail/{index}",

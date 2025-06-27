@@ -59,14 +59,8 @@ fun DetailContent(
             )
             Spacer(modifier = Modifier.padding(8.dp))
 
-            var currentVal =
-                observation.obx.first().observationValue.toString()
-            var range = observation.obx.first().referenceRange.toString()
-                .replace(
-                    observation.obx.first().referenceRange.toString(),
-                    "25 - 75",
-                    observation.obx.first().referenceRange.toString().isNullOrBlank()
-                )
+            var currentVal = observation.obx.first().observationValue.toString()
+            val range = observation.obx.first().rangeSplit()
             var valueDanger =
                 false // TODO Impl a real marker to find high values if abnormal flag is empty
             // TODO do the range parsing in the Domain layer / properply giving the range
@@ -86,7 +80,7 @@ fun DetailContent(
                         shape = RoundedCornerShape(8.dp)
                     )
                     .padding(4.dp)
-            ) { ValueGraph(currentVal.toFloat(), range) }
+            ) { ValueGraph(currentVal.toFloat(), range.get(0), range.get(1)) }
 
             if (observation.nte.isNotEmpty()) {
                 NotizBox(detailSheet = true)

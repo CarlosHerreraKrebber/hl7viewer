@@ -37,7 +37,7 @@ object HL7Parser {
             observation
         )
     }
-// add a catch when its NTE is coming before the obs group
+//TODO add a catch when its NTE is coming before the obs group
 
     fun group(segment: List<HL7Segment>): List<OBRGroup> {
         val allGroup = mutableListOf<OBRGroup>()

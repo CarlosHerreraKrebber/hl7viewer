@@ -1,6 +1,5 @@
 package com.example.apphl7.presentation.screen
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,19 +29,20 @@ import com.example.apphl7.domain.model.PID
 import com.example.apphl7.presentation.viewmodel.HL7ViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
 fun String?.costumSplit(): List<String> = this?.trim()?.split("^") ?: emptyList()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Context) {
+fun HL7Screen(navController: NavController, viewModel: HL7ViewModel) {
     val message = viewModel.parsedMessage
+    val localcontex = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.loadHL7(context)
+        viewModel.loadHL7(localcontex)
     }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val sheetState = rememberModalBottomSheetState()
@@ -57,13 +57,18 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
                 },
                 navigationIcon = {
                     IconButton(onClick = { /* TODO: Back navigation */ }) {
-                        Icon(                    painter = painterResource(id = R.drawable.iconarrowback) ,
-                             contentDescription = "Back")
+                        Icon(
+                            painter = painterResource(id = R.drawable.iconarrowback),
+                            contentDescription = "Back"
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { /* TODO: Overflow */ }) {
-                        Icon(painterResource(id = R.drawable.iconmorevet), contentDescription = "More options")
+                        Icon(
+                            painterResource(id = R.drawable.iconmorevet),
+                            contentDescription = "More options"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -105,7 +110,7 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
 
                     if (validObservations.isNotEmpty()) {
                         item {
-                            CountAuffaelligeBefunde(validObservations)
+                            CountAuffaelligeBefunde(validObservations, navController)
                         } // Show the critical findings
                         items(
                             validObservations,
@@ -125,7 +130,8 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
                                     )
                                     .clickable(
                                         onClick = {
-                                            val key = observation.obr?.setId?.toIntOrNull() ?: observation.hashCode()
+                                            val key = observation.obr?.setId?.toIntOrNull()
+                                                ?: observation.hashCode()
 
                                             if (key != -1) {
                                                 //navController.navigate("BottomDetail/$key")
@@ -137,7 +143,7 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
                                             }
                                         }),
 
-                            ) {
+                                ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Text(
 
@@ -154,13 +160,9 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
                                     )
                                     var currentVal =
                                         observation.obx.first().observationValue.toString()
-                                    var range = observation.obx.first().referenceRange.toString()
-                                        .replace(
-                                            observation.obx.first().referenceRange.toString(),
-                                            "25 - 75",
-                                            observation.obx.first().referenceRange.toString().isNullOrBlank()
-                                        )
-                                    var valueDanger = false // TODO Impl a real marker to find high values if abnormal flag is empty
+                                    val range = observation.obx.first().rangeSplit()
+                                    var valueDanger =
+                                        false // TODO Impl a real marker to find high values if abnormal flag is empty
                                     // TODO do the range parsing in the Domain layer / properply giving the range
                                     // TODO load range in int list 2x1 1. lower, 2. upper bound
                                     Text(
@@ -169,9 +171,9 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
                                     )
 
                                     Spacer(modifier = Modifier.padding(vertical = 8.dp))
-                                    ValueGraph(currentVal.toFloat(), range)
+                                    ValueGraph(currentVal.toFloat(), range.get(0), range.get(1))
 
-                                    Row(){
+                                    Row() {
                                         if (observation.nte.isNotEmpty()) {
                                             NotizBox()
                                         }
@@ -191,7 +193,7 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
                                         },
                                         sheetState = sheetState
                                     ) {
-                                        DetailContent(selectedObservation!!, context)
+                                        DetailContent(selectedObservation!!, localcontex)
                                     }
                                 }
                             }
@@ -202,8 +204,9 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel, context: Co
         }
     }
 }
+
 @Composable
-private fun AttentioniBox() {
+fun AttentioniBox() {
     Box(
         modifier = Modifier
             .padding(end = 16.dp)
@@ -220,7 +223,7 @@ private fun AttentioniBox() {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                painter = painterResource(id = R.drawable.iconcrisesallert) ,
+                painter = painterResource(id = R.drawable.iconcrisesallert),
                 contentDescription = "Warning Icon",
                 tint = Color(0xFFD32F2F),
             )
@@ -235,7 +238,15 @@ private fun AttentioniBox() {
 
 
 @Composable
-private fun CountAuffaelligeBefunde(validObservations: List<OBRGroup>) {
+private fun CountAuffaelligeBefunde(
+    validObservations: List<OBRGroup>,
+    navController: NavController
+) {
+
+    val abnormalCount = validObservations.count() { obs ->
+        obs.obx.firstOrNull()?.abnormalFlags?.isNotBlank() == true
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -248,48 +259,53 @@ private fun CountAuffaelligeBefunde(validObservations: List<OBRGroup>) {
         //verticalAlignment = Alignment.CenterVertically,
         //horizontalArrangement = Arrangement.Center // Center text inside column
     ) {
-        Box(
-            modifier = Modifier
-                .padding(end = 16.dp)
-                .size(40.dp)
-                .background(
-                    color = Color(0xFFFFCDD2), // Light red background
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painterResource(id = R.drawable.iconhighprio),
-                contentDescription = "Warning",
-                tint = Color(0xFFD32F2F), // Dark red tint
+
+        TextButton(onClick = {
+            navController.navigate("AuffaelligebefundeScreen")
+        }) {
+            Box(
                 modifier = Modifier
-                    .size(24.dp),
+                    .padding(end = 16.dp)
+                    .size(40.dp)
+                    .background(
+                        color = Color(0xFFFFCDD2), // Light red background
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.iconhighprio),
+                    contentDescription = "Warning",
+                    tint = Color(0xFFD32F2F), // Dark red tint
+                    modifier = Modifier
+                        .size(24.dp),
 
+                    )
+            }
+
+
+            Column(
+                modifier = Modifier,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    // TODO add to count when the given Value is Higher than the Range
+                    text = "${abnormalCount} auffällige Befunde",
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    color = Color.Black
                 )
+                Text(
+                    text = "Überprüfung Notwendig",
+                    textAlign = TextAlign.Center,
+                    color = Color.Red
+                )
+            }
         }
 
+        Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-        Column(
-            modifier = Modifier,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text( // TODO add to count when the given Value is Higher than the Range
-                text = "${
-                    validObservations.count() { obs ->
-                        obs.obx.firstOrNull()?.abnormalFlags?.isNotBlank() == true
-                    }
-                } auffällige Befunde",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                text = "Überprüfung Notwendig",
-                textAlign = TextAlign.Center,
-                color = Color.Red
-            )
-        }
     }
-    Spacer(modifier = Modifier.padding(vertical = 8.dp))
 }
 
 @Composable
