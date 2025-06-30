@@ -45,8 +45,9 @@ fun AuffaelligebefundeScreen(navController: NavController, viewModel: HL7ViewMod
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     var selectedObservation by remember { mutableStateOf<OBRGroup?>(null) }
-// TODO fixing the navBack to Main screen prpblem is preety sure to be  selected Observation
-    androidx.compose.material3.Scaffold(
+// TODO fixing the navBack to Main screen
+//  Problem is pretty sure to be on the Bottom Sheet selected Observation -> Nullpionter
+    Scaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -84,11 +85,8 @@ fun AuffaelligebefundeScreen(navController: NavController, viewModel: HL7ViewMod
             modifier = Modifier
                 .padding(innerPadding)
         ) {
-
             LazyColumn {
                 if (auffaeObservs!!.isNotEmpty()) {
-
-
                     items(auffaeObservs) { observation ->
                         ElevatedCard(
                             elevation = CardDefaults.cardElevation(
@@ -104,7 +102,6 @@ fun AuffaelligebefundeScreen(navController: NavController, viewModel: HL7ViewMod
                                     onClick = {
                                         val key = observation.obr?.setId?.toIntOrNull()
                                             ?: observation.hashCode()
-
                                         if (key != -1) {
                                             coroutineScope.launch {
                                                 selectedObservation = observation
@@ -133,12 +130,12 @@ fun AuffaelligebefundeScreen(navController: NavController, viewModel: HL7ViewMod
                                 var currentVal =
                                     observation.obx.first().observationValue.toString()
                                 val range = observation.obx.first().rangeSplit()
-                                var valueDanger =
-                                    false // TODO Impl a real marker to find high values if abnormal flag is empty
+                                var valueDanger = false
+                                // TODO Impl a real marker to find high values if abnormal flag is empty
                                 // TODO do the range parsing in the Domain layer / properply giving the range
                                 // TODO load range in int list 2x1 1. lower, 2. upper bound
                                 Text(
-                                    text = "current Value " + currentVal,
+                                    text = "Current Value " + currentVal,
                                     style = MaterialTheme.typography.titleMedium
                                 )
 
@@ -149,35 +146,33 @@ fun AuffaelligebefundeScreen(navController: NavController, viewModel: HL7ViewMod
                                     if (observation.nte.isNotEmpty()) {
                                         NotizBox()
                                     }
-                                    if ((observation.obx.firstOrNull()?.abnormalFlags?.isNotBlank() == true) || valueDanger) {
+                                    if ((observation.obx.firstOrNull()?.abnormalFlags?.isNotBlank() == true)
+                                        || valueDanger
+                                    ) {
                                         AttentioniBox()
                                     }
                                 }
                             }
 
+                            if (selectedObservation != null) {
+                                ModalBottomSheet(
+                                    onDismissRequest = {
+                                        coroutineScope.launch {
+                                            sheetState.hide()
+                                        }.invokeOnCompletion {
+                                            selectedObservation = null
+                                        }
+                                    },
+                                    sheetState = sheetState
+                                ) {
+                                    DetailContent(selectedObservation!!, localcontex)
+                                }
+                            }
                         }
                     }
                 }
-            }// show all findings
-            if (selectedObservation != null) {
-                ModalBottomSheet(
-                    onDismissRequest = {
-                        coroutineScope.launch {
-                            sheetState.hide()
-                        }
-                    },
-                    sheetState = sheetState
-                ) {
-                    selectedObservation?.let {
-                        DetailContent(it, localcontex)
-                    }
-                }
-                LaunchedEffect(sheetState.isVisible) {
-                    if (!sheetState.isVisible) {
-                        selectedObservation = null
-                    }
-                }
-            }
+            } // show all findings
+
         }
     }
 }

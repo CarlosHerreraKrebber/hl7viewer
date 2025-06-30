@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +37,10 @@ fun String?.costumSplit(): List<String> = this?.trim()?.split("^") ?: emptyList(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HL7Screen(navController: NavController, viewModel: HL7ViewModel) {
+
+    /*
+    Main Screen Of the Application
+     */
     val message = viewModel.parsedMessage
     val localcontex = LocalContext.current
 
@@ -89,18 +92,14 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel) {
             modifier = Modifier
                 .padding(innerPadding)
         ) {
-
-
             if (message == null) {
                 Text("No HL7 content parsed yet.")
             } else {
-
                 val hl7Type = message.msh?.messageType?.costumSplit()?.joinToString(" ")
 
                 val personID = message.pid
                 val validObservations =
                     message.observations.obrGroup.filter { it.obx.first().valueType == "CE" }
-
 
                 LazyColumn {
 
@@ -114,7 +113,7 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel) {
                         } // Show the critical findings
                         items(
                             validObservations,
-                            key = { observation -> // TODO check this key thing
+                            key = { observation ->
                                 observation.obr?.setId?.toIntOrNull() ?: observation.hashCode()
                             }
                         ) { observation ->
@@ -132,18 +131,15 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel) {
                                         onClick = {
                                             val key = observation.obr?.setId?.toIntOrNull()
                                                 ?: observation.hashCode()
-
                                             if (key != -1) {
-                                                //navController.navigate("BottomDetail/$key")
                                                 coroutineScope.launch {
                                                     selectedObservation = observation
                                                     sheetState.show()
                                                 }
-
                                             }
                                         }),
 
-                                ) {
+                                ) { // TODO Refeactor card Content
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Text(
 
@@ -161,12 +157,12 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel) {
                                     var currentVal =
                                         observation.obx.first().observationValue.toString()
                                     val range = observation.obx.first().rangeSplit()
-                                    var valueDanger =
-                                        false // TODO Impl a real marker to find high values if abnormal flag is empty
+                                    var valueDanger = false
+                                    // TODO Impl a real marker to find high values if abnormal flag is empty
                                     // TODO do the range parsing in the Domain layer / properply giving the range
                                     // TODO load range in int list 2x1 1. lower, 2. upper bound
                                     Text(
-                                        text = "current Value " + currentVal,
+                                        text = "Current Value " + currentVal,
                                         style = MaterialTheme.typography.titleMedium
                                     )
 
@@ -177,7 +173,9 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel) {
                                         if (observation.nte.isNotEmpty()) {
                                             NotizBox()
                                         }
-                                        if ((observation.obx.firstOrNull()?.abnormalFlags?.isNotBlank() == true) || valueDanger) {
+                                        if ((observation.obx.firstOrNull()?.abnormalFlags?.isNotBlank() == true)
+                                            || valueDanger
+                                        ) {
                                             AttentioniBox()
                                         }
                                     }
@@ -204,38 +202,6 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel) {
         }
     }
 }
-
-@Composable
-fun AttentioniBox() {
-    Box(
-        modifier = Modifier
-            .padding(end = 16.dp)
-            .wrapContentSize(Alignment.Center)
-            .background(
-                color = Color(0xFFFFCDD2), // Light red background
-                shape = RoundedCornerShape(8.dp)
-            )
-            .padding(
-                horizontal = 8.dp,
-                vertical = 4.dp
-            ),// inner padding
-        // contentAlignment = Alignment.Center,
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(id = R.drawable.iconcrisesallert),
-                contentDescription = "Warning Icon",
-                tint = Color(0xFFD32F2F),
-            )
-            Text(
-                text = "Erhöter Wert",
-                color = Color(0xFFD32F2F),
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
-    }
-}
-
 
 @Composable
 private fun CountAuffaelligeBefunde(

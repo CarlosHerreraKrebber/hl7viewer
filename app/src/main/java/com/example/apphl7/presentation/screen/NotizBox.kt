@@ -18,20 +18,15 @@ import androidx.compose.ui.unit.dp
 import com.example.apphl7.R
 
 @Composable
-fun NotizBox(detailSheet: Boolean = false) {
+fun NotizBox(detailContent: Boolean = false) {
 
-    if(detailSheet) {
+    if (detailContent) {
         Box(
-            modifier = Modifier
-//                .padding(
-//                    horizontal = 8.dp,
-//                    vertical = 8.dp
-//                ),// inner padding
-            // contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.Center
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    painter = painterResource(id = R.drawable.iconnotes) ,
+                    painter = painterResource(id = R.drawable.iconnotes),
                     contentDescription = "Info icon",
                     tint = Color(0xFF0077B6)
                 )
@@ -42,27 +37,23 @@ fun NotizBox(detailSheet: Boolean = false) {
                 )
             }
         }
-    }
-else {
+    } else {
         Box(
             modifier = Modifier
                 .padding(end = 16.dp)
                 .wrapContentSize(Alignment.Center)
                 .background(
-                    color = if (detailSheet) {
-                        Color(0x00ADE8F4)
-                    } else Color(0xFFADE8F4),
+                    color = Color(0xFFADE8F4),
                     shape = RoundedCornerShape(8.dp)
                 )
                 .padding(
                     horizontal = 8.dp,
                     vertical = 4.dp
-                ),// inner padding
-            // contentAlignment = Alignment.Center,
+                ), // inner padding
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    painter = painterResource(id = R.drawable.iconnotes) ,
+                    painter = painterResource(id = R.drawable.iconnotes),
                     contentDescription = "Info icon",
                     tint = Color(0xFF0077B6)
                 )

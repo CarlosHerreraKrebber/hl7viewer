@@ -1,8 +1,9 @@
 package com.example.apphl7.domain.model
 
 data class ObservationGroups(
-    val orc: ORC?,
-    val obrGroup: List<OBRGroup> = emptyList()
+    val orc: ORC?, // Common order segment
+    val obrGroup: List<OBRGroup> = emptyList() // Observation
+    // TODO add pottential NTE here
     )
 {
     fun getAbnormalCount(): Int {
@@ -11,4 +12,5 @@ data class ObservationGroups(
        }
     }
     // TODO add a fun to count the erhöhte values
+    // TODO Notes extraction could be potentionaly refactored to here as extension
 }

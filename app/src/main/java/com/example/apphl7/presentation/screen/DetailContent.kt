@@ -31,28 +31,24 @@ import com.example.apphl7.domain.model.OBRGroup
 @Composable
 fun DetailContent(
     observation: OBRGroup,
-    lokalcontex: Context,
+    localcontex: Context,
 ) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
-        ),
-        modifier = Modifier
+        ), modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-        // val setId = observation.obr?.setId?.toIntOrNull() ?: return@clickable
-        //navController.navigate("BottomDetail/$setId") })  ,
-    ) {
+    ) { // TODO Refeactor card Content
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
 
-                text = observation.obx.first().observationId.costumSplit()
-                    .drop(1).joinToString(" ").replace(
+                text = observation.obx.first().observationId.costumSplit().drop(1).joinToString(" ")
+                    .replace(
                         Regex("\\s+"), " "
-                    ),
-                style = MaterialTheme.typography.titleLarge
+                    ), style = MaterialTheme.typography.titleLarge
             )
-            androidx.compose.material3.Text(
+            Text(
                 text = "in " + observation.obx.first().units.toString(),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
@@ -61,14 +57,20 @@ fun DetailContent(
 
             var currentVal = observation.obx.first().observationValue.toString()
             val range = observation.obx.first().rangeSplit()
-            var valueDanger =
-                false // TODO Impl a real marker to find high values if abnormal flag is empty
+            var valueDanger = false
+            // TODO Impl a real marker to find high values if abnormal flag is empty
             // TODO do the range parsing in the Domain layer / properply giving the range
             // TODO load range in int list 2x1 1. lower, 2. upper bound
-            Text(
-                text = "current Value " + currentVal,
-                style = MaterialTheme.typography.titleMedium
-            )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                if ((observation.obx.firstOrNull()?.abnormalFlags?.isNotBlank() == true) || valueDanger) {
+                    AttentioniBox()
+                }
+                Text(
+                    text = "Current Value " + currentVal, style = MaterialTheme.typography.titleMedium
+                )
+            }
 
             Spacer(modifier = Modifier.padding(vertical = 16.dp))
 
@@ -76,23 +78,21 @@ fun DetailContent(
                 modifier = Modifier
                     .wrapContentSize(Alignment.Center)
                     .background(
-                        color = Color.LightGray,
-                        shape = RoundedCornerShape(8.dp)
+                        color = Color.LightGray, shape = RoundedCornerShape(8.dp)
                     )
                     .padding(4.dp)
-            ) { ValueGraph(currentVal.toFloat(), range.get(0), range.get(1)) }
+            ) {
+                ValueGraph(currentVal.toFloat(), range.get(0), range.get(1))
+            }
 
             if (observation.nte.isNotEmpty()) {
-                NotizBox(detailSheet = true)
-                Text(
-                    text = "Info Notiz: " + observation.nte.mapNotNull {
-                        it.comment?.replace(
-                            Regex("\\s+"), " "
-                        )
-                    }.filter { it.isNotBlank() }
-                        .joinToString(),
-                    style = MaterialTheme.typography.titleMedium
-                )
+                NotizBox(detailContent = true)
+                Text(text = "Info Notiz:\\n" + observation.nte.mapNotNull {
+                    it.comment?.replace(
+                        Regex("\\s+"), " "
+                    )
+                }.filter { it.isNotBlank() }.joinToString(),
+                    style = MaterialTheme.typography.titleMedium)
             }
 
             Spacer(modifier = Modifier.padding(vertical = 8.dp))
@@ -100,18 +100,14 @@ fun DetailContent(
             Box(
                 modifier = Modifier
                     .background(
-                        color = Color.LightGray,
-                        shape = RoundedCornerShape(8.dp)
+                        color = Color.LightGray, shape = RoundedCornerShape(8.dp)
                     )
                     .padding(
-                        start = 8.dp,
-                        end = 8.dp
+                        start = 8.dp, end = 8.dp
                     )
                     .wrapContentSize(Alignment.Center),
-
-                )
-            {
-                HyperLinkButton(observation, lokalcontex)
+                ) {
+                HyperLinkButton(observation, localcontex)
             }
         }
     }
@@ -119,26 +115,24 @@ fun DetailContent(
 
 @Composable
 private fun HyperLinkButton(
-    observation: OBRGroup,
-    lokalcontex: Context
+    observation: OBRGroup, localcontex: Context
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
 
         TextButton(onClick = {
             val query = Uri.encode(
-                observation.obx.first().observationId.costumSplit()
-                    .drop(1).joinToString(" ").replace(
+                observation.obx.first().observationId.costumSplit().drop(1).joinToString(" ")
+                    .replace(
                         Regex("\\s+"), " "
                     )
             )
             val url = "https://www.google.com/search?q=$query"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            lokalcontex.startActivity(intent)
+            localcontex.startActivity(intent)
         }) {
             Icon(painterResource(id = R.drawable.iconhyperlink), contentDescription = "Search")
             Text(
-                "Weitere Informationen",
-                style = MaterialTheme.typography.titleMedium
+                "Weitere Informationen", style = MaterialTheme.typography.titleMedium
             )
         }
     }

@@ -28,25 +28,28 @@ object HL7Parser {
         val pv1 = rawSegments.find { it.name == PV1.segID }?.let { PV1.fromSegment(it) }
         val orc = rawSegments.find { it.name == ORC.segID }?.let { ORC.fromSegment(it) }
 
-        val obrs = group(rawSegments)
+        val (obrs,pNet) = group(rawSegments)
         val observation = ObservationGroups(orc,obrs)
         return HL7Message(
             msh,
             pid,
             pv1,
+            pNet,
             observation
         )
     }
-//TODO add a catch when its NTE is coming before the obs group
+//TODO add a catch when its NTE didderentciate the NTE to eaterh PID or OCR level
 
-    fun group(segment: List<HL7Segment>): List<OBRGroup> {
+    fun group(segment: List<HL7Segment>): Pair<List<OBRGroup>, List<NTE>>  {
         val allGroup = mutableListOf<OBRGroup>()
         var currentOBR: OBR? = null
         val currentOBXs = mutableListOf<OBX>()
         val currentNTEs = mutableListOf<NTE>()
+        val patientNTEs = mutableListOf<NTE>()
         for (seg in segment) {
             when (seg.name) {
                 OBR.segID -> {
+                    // Checks for OBR seg ocurrance and addes the observation(obx) and note(note)
                     if (currentOBR != null) {
                         allGroup.add(OBRGroup(currentOBR, currentOBXs.toList(), currentNTEs.toList()))
                         currentOBXs.clear()
@@ -55,12 +58,18 @@ object HL7Parser {
                     currentOBR = OBR.fromSegment(seg)
                 }
                 OBX.segID -> currentOBXs.add(OBX.fromSegment(seg))
-                NTE.segID -> currentNTEs.add(NTE.fromSegment(seg))
+                NTE.segID -> {
+                    // Stores NTE in a patient NTE level list if occurence befor OBR
+                    if (currentOBR != null) {
+                        currentNTEs.add(NTE.fromSegment(seg))
+                    }
+                    patientNTEs.add(NTE.fromSegment(seg))
+                }
             }
         }
         if (currentOBR != null){ // close last open group
             allGroup.add(OBRGroup(currentOBR, currentOBXs, currentNTEs))
         }
-        return allGroup
+        return Pair(allGroup, patientNTEs)
     }
 }
