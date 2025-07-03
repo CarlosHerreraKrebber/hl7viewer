@@ -112,7 +112,7 @@ fun HL7Screen(navController: NavController, viewModel: HL7ViewModel) {
                             CountAuffaelligeBefunde(validObservations, navController)
                         } // Show the critical findings
                         items(
-                            validObservations,
+                            items = validObservations,
                             key = { observation ->
                                 observation.obr?.setId?.toIntOrNull() ?: observation.hashCode()
                             }

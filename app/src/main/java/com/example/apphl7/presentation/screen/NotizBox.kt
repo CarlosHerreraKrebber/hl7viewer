@@ -17,6 +17,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.apphl7.R
 
+/**
+ * Creates a box with Note icon and Notiz
+ */
 @Composable
 fun NotizBox(detailContent: Boolean = false) {
 

@@ -87,7 +87,7 @@ fun AuffaelligebefundeScreen(navController: NavController, viewModel: HL7ViewMod
         ) {
             LazyColumn {
                 if (auffaeObservs!!.isNotEmpty()) {
-                    items(auffaeObservs) { observation ->
+                    items(  items = auffaeObservs) { observation ->
                         ElevatedCard(
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 6.dp

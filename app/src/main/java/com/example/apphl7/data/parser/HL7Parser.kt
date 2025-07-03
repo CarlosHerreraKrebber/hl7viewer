@@ -12,10 +12,6 @@ import com.example.apphl7.domain.model.ObservationGroups
 import com.example.apphl7.domain.model.PID
 import com.example.apphl7.domain.model.PV1
 
-/*
-
- */
-
 object HL7Parser {
     fun parse(content: String): HL7Message {
         val rawSegments = content.lines().filter { it.isNotBlank() }.map { line ->
@@ -38,7 +34,7 @@ object HL7Parser {
             observation
         )
     }
-//TODO add a catch when its NTE didderentciate the NTE to eaterh PID or OCR level
+// TODO add a catch when its NTE differentciate the NTE to eaterh PID or OCR level
 
     fun group(segment: List<HL7Segment>): Pair<List<OBRGroup>, List<NTE>>  {
         val allGroup = mutableListOf<OBRGroup>()

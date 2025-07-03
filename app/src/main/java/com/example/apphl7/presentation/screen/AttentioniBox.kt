@@ -17,7 +17,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.apphl7.R
 
-
+/**
+ * Creates a box with Attention Crisis icon and Erhöter Wert
+ */
 @Composable
 fun AttentioniBox() {
     Box(
